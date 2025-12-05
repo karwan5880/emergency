@@ -39,3 +39,7 @@ next-env.d.ts
 # convex
 .convex/
 
+# local files
+_error.txt
+_notes.txt
+
