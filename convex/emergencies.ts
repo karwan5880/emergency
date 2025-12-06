@@ -14,10 +14,10 @@ export const getUserEmergencies = query({
     const emergencies = await ctx.db
       .query("emergencies")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .order("desc")
       .collect();
 
-    return emergencies;
+    // Sort by createdAt descending (most recent first)
+    return emergencies.sort((a, b) => b.createdAt - a.createdAt);
   },
 });
 
@@ -41,7 +41,14 @@ export const getEmergency = query({
 
 // Query: Get emergencies by status
 export const getEmergenciesByStatus = query({
-  args: { status: v.union(v.literal("pending"), v.literal("in-progress"), v.literal("resolved"), v.literal("cancelled")) },
+  args: {
+    status: v.union(
+      v.literal("pending"),
+      v.literal("in-progress"),
+      v.literal("resolved"),
+      v.literal("cancelled")
+    ),
+  },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
@@ -52,10 +59,10 @@ export const getEmergenciesByStatus = query({
       .query("emergencies")
       .withIndex("by_status", (q) => q.eq("status", args.status))
       .filter((q) => q.eq(q.field("userId"), userId))
-      .order("desc")
       .collect();
 
-    return emergencies;
+    // Sort by createdAt descending (most recent first)
+    return emergencies.sort((a, b) => b.createdAt - a.createdAt);
   },
 });
 
@@ -76,7 +83,9 @@ export const getEmergencyStats = query({
     const active = allEmergencies.filter(
       (e) => e.status === "pending" || e.status === "in-progress"
     ).length;
-    const resolved = allEmergencies.filter((e) => e.status === "resolved").length;
+    const resolved = allEmergencies.filter(
+      (e) => e.status === "resolved"
+    ).length;
 
     return {
       active,
