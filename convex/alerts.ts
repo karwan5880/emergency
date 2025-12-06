@@ -9,6 +9,81 @@ import {
 } from "./severity";
 
 /**
+ * Calculate distance between two coordinates using Haversine formula
+ * Returns distance in kilometers
+ */
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
+ * Notify all users within radius of an alert location
+ */
+async function notifyNearbyUsers(
+  ctx: any,
+  alertLatitude: number,
+  alertLongitude: number,
+  radiusKm: number,
+  alertId: any,
+  title: string
+) {
+  // Get all users with location data
+  const allUsers = await ctx.db.query("users").collect();
+
+  const notifiedUsers: string[] = [];
+
+  for (const user of allUsers) {
+    // Skip if user doesn't have location
+    if (
+      user.lastKnownLatitude === undefined ||
+      user.lastKnownLongitude === undefined
+    ) {
+      continue;
+    }
+
+    // Calculate distance
+    const distance = calculateDistance(
+      alertLatitude,
+      alertLongitude,
+      user.lastKnownLatitude,
+      user.lastKnownLongitude
+    );
+
+    // Notify if within radius
+    if (distance <= radiusKm) {
+      await ctx.db.insert("notifications", {
+        userId: user.clerkId,
+        type: "emergency",
+        title: "🚨 EMERGENCY ALERT - AlertRun",
+        message: `${title || "Emergency incident"} detected ${distance.toFixed(
+          1
+        )}km away. Tap to view live stream.`,
+        read: false,
+        createdAt: Date.now(),
+      });
+      notifiedUsers.push(user.clerkId);
+    }
+  }
+
+  return notifiedUsers;
+}
+
+/**
  * Mutation: Create a new emergency alert with initial tap
  */
 export const createAlert = mutation({
@@ -56,6 +131,17 @@ export const createAlert = mutation({
       latitude: args.latitude,
       longitude: args.longitude,
     });
+
+    // Notify nearby users immediately (initial radius: 3km for any alert)
+    const initialRadius = 3; // Start with 3km radius
+    await notifyNearbyUsers(
+      ctx,
+      args.latitude,
+      args.longitude,
+      initialRadius,
+      alertId,
+      args.title || "Emergency Alert"
+    );
 
     return alertId;
   },
@@ -139,6 +225,19 @@ export const recordTap = mutation({
       updatedAt: now,
     });
 
+    // If severity increased significantly, notify more users with expanded radius
+    if (escalationThreshold !== null && newSeverity >= 50) {
+      const expandedRadius = getNotificationRadius(newSeverity);
+      await notifyNearbyUsers(
+        ctx,
+        alert.latitude,
+        alert.longitude,
+        expandedRadius,
+        args.alertId,
+        alert.title || "Emergency Alert"
+      );
+    }
+
     return {
       alertId: args.alertId,
       severityScore: newSeverity,
@@ -220,6 +319,50 @@ export const getUserActiveAlerts = query({
 
     // Sort by createdAt descending (most recent first)
     return alerts.sort((a, b) => b.createdAt - a.createdAt);
+  },
+});
+
+/**
+ * Query: Get nearby active alerts for current user
+ */
+export const getNearbyActiveAlerts = query({
+  args: {
+    latitude: v.number(),
+    longitude: v.number(),
+    radiusKm: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return [];
+    }
+
+    const radius = args.radiusKm || 10; // Default 10km radius
+    const allAlerts = await ctx.db
+      .query("emergency_alerts")
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("status"), "active"),
+          q.eq(q.field("status"), "escalated")
+        )
+      )
+      .collect();
+
+    // Filter alerts by distance
+    const nearbyAlerts = allAlerts
+      .map((alert) => {
+        const distance = calculateDistance(
+          args.latitude,
+          args.longitude,
+          alert.latitude,
+          alert.longitude
+        );
+        return { ...alert, distance };
+      })
+      .filter((alert) => alert.distance <= radius)
+      .sort((a, b) => a.distance - b.distance); // Closest first
+
+    return nearbyAlerts;
   },
 });
 
@@ -389,5 +532,47 @@ export const saveVideoToAlert = mutation({
     });
 
     return { success: true };
+  },
+});
+
+/**
+ * Query: Get alert history (all statuses, for history page)
+ */
+export const getAlertHistory = query({
+  args: {
+    latitude: v.number(),
+    longitude: v.number(),
+    radiusKm: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const radiusKm = args.radiusKm || 50;
+
+    // Get all alerts (not just active) from last 7 days
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+    const allAlerts = await ctx.db
+      .query("emergency_alerts")
+      .withIndex("by_createdAt")
+      .filter((q) => q.gte(q.field("createdAt"), sevenDaysAgo))
+      .order("desc")
+      .collect();
+
+    // Filter by distance and add distance to each alert
+    const alertsWithDistance = allAlerts
+      .map((alert) => {
+        const distance = calculateDistance(
+          args.latitude,
+          args.longitude,
+          alert.latitude,
+          alert.longitude
+        );
+        return {
+          ...alert,
+          distance,
+        };
+      })
+      .filter((alert) => alert.distance <= radiusKm);
+
+    return alertsWithDistance;
   },
 });

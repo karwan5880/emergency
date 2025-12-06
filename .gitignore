@@ -39,10 +39,8 @@ next-env.d.ts
 # convex
 .convex/
 
-# local files
-_logs*.txt
-_errors*.txt
-_notes.txt
+# local/personal files (underscore prefix)
+_*
 
 
 # clerk configuration (can include secrets)

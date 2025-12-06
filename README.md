@@ -1,166 +1,103 @@
-# Emergency App - Modern Emergency Management Application
+Team Name: BuddhaIsHere
+App Name: AlertRun - Combining Live Stream & Phone Call (Siren)
 
-A cutting-edge emergency management application built with Next.js, React, TypeScript, and modern web technologies.
+## Introduction
 
-## 🚀 Features
+**What is AlertRun?**
 
-- **User Authentication**: Secure sign-up and sign-in with Clerk
-- **Emergency Reporting**: Report and track emergency incidents
-- **Real-time Notifications**: Instant alerts and updates
-- **Priority Management**: Categorize emergencies by priority level
-- **Status Tracking**: Monitor emergency status in real-time
-- **Dashboard Analytics**: Overview of active and resolved emergencies
-- **Responsive Design**: Works seamlessly on desktop and mobile
+**AlertRun** is a life-saving emergency alert app that instantly notifies nearby users when a disaster is detected.
 
-## 🛠️ Tech Stack
+Imagine this: User A spots a fire at the bottom of a tall building. No matter how loud they shout, people inside can't hear them. With AlertRun, User A taps their phone 3 times, starts live streaming, and within seconds — everyone in nearby buildings receives a loud phone call-style alarm with the live video feed.
 
-### Frontend
-- **Next.js 16** - React framework with SSR
-- **React 19** - UI library
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
-- **shadcn/ui** - Beautiful, accessible UI components
-- **Lucide React** - Icon library
+**The core idea**: Combine the urgency of a phone call (loud, immediate, hard to ignore) with the reach of live streaming (one-to-many broadcast). The more people tap the emergency button, the more serious the incident becomes, and the louder the alarm rings for everyone nearby.
 
-### Backend & Database
-- **Convex** - Full-stack TypeScript platform for real-time apps
-- **Clerk** - Modern authentication solution
+## App Inspiration
 
-### Additional Services
-- **Vercel** - Hosting & deployment
+[Show the video here]
 
-## 📁 Project Structure
+## Challenges
 
-```
-emergency/
-├── src/
-│   ├── app/
-│   │   ├── dashboard/        # Dashboard page
-│   │   ├── sign-in/          # Sign-in page
-│   │   ├── sign-up/          # Sign-up page
-│   │   ├── layout.tsx        # Root layout with providers
-│   │   └── page.tsx          # Landing page
-│   ├── components/
-│   │   └── ui/               # shadcn/ui components
-│   └── lib/                  # Utility functions
-├── convex/
-│   └── schema.ts             # Convex database schema
-└── public/                   # Static assets
-```
+### User Adoption Challenges
 
-## 🚀 Getting Started
+- People may be reluctant to install the app on their phone.
+  - Solution 1: Keep the app lightweight.
+  - Solution 2: Choose a meaningful app name. We suggest "BuddhaIsHere" — a small app (50-100MB) that could one day save your life. The app represents protection and safety.
+- Users often have their phones on silent mode.
+- No internet connectivity (rare but possible).
 
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-- GitHub account
-- Clerk account (https://dashboard.clerk.com)
-- Convex account (https://www.convex.dev)
+### Technical Challenges
 
-### Installation
+- Server infrastructure with AI/LLM/vLLM to analyze video and live stream fragments requires significant computation.
+- Speed is critical — every millisecond counts.
+- The time from when a live stream starts until people believe it is real and begin evacuating must be minimized.
+- Targeting users accurately is difficult; location data may be imprecise. (Consider a subscriber model based on address or community groups.)
+- Live streaming is really hard to build — the networking, infrastructure, and latency requirements are complex.
+- The backend infrastructure is expensive to maintain at scale.
 
-1. Navigate to the emergency directory:
-```bash
-cd emergency
-```
+### Misuse Concerns
 
-2. Install dependencies:
-```bash
-npm install
-```
+- What if users abuse the emergency button as a prank? (Proposed solution: add penalties or legal consequences. Honestly, not sure how to enforce this.)
+- This could create more chaos than safety, undermining the app's purpose.
 
-3. Set up environment variables:
-Create a `.env.local` file in the root directory with the following variables:
-```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_SECRET_KEY=your_clerk_secret_key
-NEXT_PUBLIC_CONVEX_URL=your_convex_url
-```
+### Current Communication Models
 
-4. Set up Convex:
-```bash
-npx convex dev
-```
-Follow the prompts to create a new Convex project or link to an existing one.
+- Phone call: One-to-one
+- Microsoft Teams / Zoom: Many-to-many (meetings)
+- Twitch / YouTube livestream: One-to-many (broadcasting)
 
-5. Run the development server:
-```bash
-npm run dev
-```
+### Our Approach
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+- We need a one-to-many **force broadcasting** system at the app or OS level.
+- Think of it as Twitch live streaming combined with an extremely loud notification, siren, or alarm.
+- A phone call rings immediately, loud and clear. This app works the same way — but instead of calling one person, you alert thousands.
+- Once the foundation is established, we can add additional features:
+  - Location map
+  - Chat system (for real-time communication)
+  - Other enhancements as needed
 
-## 🏗️ Architecture
+### GOLDEN FEATURE
 
-### Database Schema
-- **users**: User profiles and metadata
-- **emergencies**: Emergency reports and incidents
-- **notifications**: User notifications and alerts
+- TAP! TAP! TAP! THE MORE YOU TAP! THE LOUDER THE SIREN! THE MORE SERIOUS THE INCIDENT IS!
 
-### Authentication Flow
-1. User signs up/in via Clerk
-2. User data synced to Convex
-3. Dashboard accessible only to authenticated users
-4. Real-time updates via Convex subscriptions
+## Vision
 
-## 🔒 Security
+- This is currently a web app demo.
+- Ideally, we want to develop a native app — similar to WhatsApp, where incoming calls ring even when the app is in the background.
 
-- Bank-level 256-bit encryption
-- Secure authentication with Clerk
-- Type-safe operations with TypeScript
-- Input validation on all forms
-- HTTPS-only in production
-- Environment variables for sensitive data
+## Existing System Studies (didn't do enough sorry)
 
-## 📊 Core Features Implementation
+- Malaysia 999 emergency service
+- Apple emergency call SOS feature
 
-### Dashboard
-- Emergency overview
-- Quick action buttons
-- Recent emergencies list
-- Status tracking
+## Why This Matters
 
-### Emergency Management
-- Report new emergencies
-- Set priority levels
-- Track status updates
-- Real-time notifications
+- It is 2025. We have the technology, AI, and internet speeds capable of live streaming.
+- We have all the tools we need.
+- An app like this has the potential to save hundreds of lives.
 
-### Notifications
-- Real-time emergency alerts
-- Status update notifications
-- Priority-based notifications
+## Tech Stack / Tools Used
 
-## 🚢 Deployment
+- Claude Code
+- Cursor
+- Clerk (authentication)
+- Convex (backend/database)
+- React / Next.js
 
-Deploy to Vercel with one click:
+## Features (Future)
 
-1. Push to GitHub
-2. Connect GitHub to Vercel
-3. Set environment variables in Vercel dashboard
-4. Deploy!
+- Subscribe mode (address-based notifications)
+- Radius-based mode (km range alerts)
 
-## 📈 Future Enhancements
+## Closing Thoughts
 
-- [ ] Location-based emergency tracking
-- [ ] Team collaboration features
-- [ ] Advanced analytics and reports
-- [ ] Mobile app (React Native)
-- [ ] Integration with emergency services
-- [ ] Real-time chat functionality
-- [ ] Emergency response workflows
+- 關心一下不認識的陌生人
+- 看似沒用的 app，放在手機裏，也許能救你愛的人一命
 
-## 🤝 Contributing
+(Care for strangers you don't know. A seemingly useless app sitting in your phone might one day save the life of someone you love.)
 
-Contributions are welcome! Feel free to open issues or submit pull requests.
+## Footnotes
 
-## 📝 License
-
-This project is licensed under the MIT License.
-
----
-
-**Status**: 🚀 Ready for Development
-
-Built with the same tech stack as Fintech Banking App
-
+- All of this is a mockup only. It can't function without a proper backend — especially the live streaming and AI components.
+- As mentioned in the "Challenges" section, spending five or six figures to save a certain number of lives — is it really worth it? Unless we can drastically drive the cost down.
+- Cool idea, but not realistic, in my opinion.
+- Or, unless somebody takes this project as a startup idea and creates a new TikTok out of it?

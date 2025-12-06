@@ -12,54 +12,48 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col">
-      {/* Simple Header */}
-      <header className="p-6">
+      {/* Simple Header - Responsive */}
+      <header className="p-4 sm:p-6">
         <div className="flex items-center justify-center gap-2">
-          <AlertCircle className="w-8 h-8 text-red-500" />
-          <span className="text-2xl font-bold">Emergency App</span>
+          <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
+          <span className="text-lg sm:text-xl font-bold">AlertRun</span>
         </div>
       </header>
 
-      {/* Main Content - Centered */}
-      <div className="flex-1 flex items-center justify-center px-4">
-        <div className="text-center space-y-8 max-w-md w-full">
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-              Emergency Response
+      {/* Main Content - Responsive */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="text-center space-y-8 sm:space-y-12 max-w-sm sm:max-w-md lg:max-w-lg w-full">
+          {/* Story - Responsive Text */}
+          <div className="space-y-4 sm:space-y-6">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
+              One Tap.
+              <br />
+              Everyone Alerted.
             </h1>
-            <p className="text-slate-400 text-lg">
-              Report emergencies quickly and securely
+            <p className="text-slate-300 text-base sm:text-lg lg:text-xl leading-relaxed px-2">
+              See a fire? Tap once. Everyone nearby gets an instant alert.
             </p>
           </div>
 
-          {/* Big Centered Button */}
-          <div className="space-y-4">
-            <Button 
-              size="lg" 
-              className="w-full max-w-xs mx-auto bg-red-600 hover:bg-red-700 text-white text-lg py-8 px-12 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105" 
+          {/* Single CTA - Responsive */}
+          <div>
+            <Button
+              size="lg"
+              className="w-full bg-red-600 hover:bg-red-700 text-white text-lg sm:text-xl lg:text-2xl py-5 sm:py-6 lg:py-7 px-6 sm:px-8 lg:px-10 rounded-xl sm:rounded-2xl shadow-2xl"
               asChild
             >
-              <a href="/sign-up" className="flex items-center justify-center gap-3">
-                <AlertCircle className="w-6 h-6" />
+              <a href="/sign-up" className="block">
                 Get Started
               </a>
             </Button>
-            
-            <p className="text-sm text-slate-500">
-              Already have an account?{" "}
-              <a href="/sign-in" className="text-red-400 hover:text-red-300 underline">
-                Sign In
+            <p className="text-xs sm:text-sm text-slate-500 mt-3 sm:mt-4">
+              <a href="/sign-in" className="underline">
+                Sign in
               </a>
             </p>
           </div>
         </div>
       </div>
-
-      {/* Simple Footer */}
-      <footer className="p-6 text-center text-xs text-slate-500">
-        <p>&copy; 2024 Emergency App. All rights reserved.</p>
-      </footer>
     </main>
   );
 }
-

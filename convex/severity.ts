@@ -1,23 +1,25 @@
 /**
  * Severity calculation helpers for emergency alerts
- * Formula: 30% tap count + 40% frequency + 30% unique users
+ * Formula: 20% tap count + 30% frequency + 50% active users (whistleblowers)
+ * More active users = higher severity (critical for life-saving)
  * Returns 0-100 score
  */
 
 export function calculateSeverityScore(
   tapCount: number,
   tapFrequency: number, // taps per second
-  uniqueUserCount: number
+  uniqueUserCount: number // number of active whistleblowers
 ): number {
   // Normalize each metric to 0-1, then apply weights
   // Tap count: max at 50 taps (normalization)
-  const tapScore = Math.min(tapCount / 50 * 30, 30);
+  const tapScore = Math.min((tapCount / 50) * 20, 20);
 
   // Tap frequency: max at 5 taps per second (normalization)
-  const frequencyScore = Math.min(tapFrequency / 5 * 40, 40);
+  const frequencyScore = Math.min((tapFrequency / 5) * 30, 30);
 
-  // Unique users: max at 10 users (normalization)
-  const userScore = Math.min(uniqueUserCount / 10 * 30, 30);
+  // Active users (whistleblowers): max at 10 users (normalization)
+  // HEAVILY WEIGHTED - more whistleblowers = more critical
+  const userScore = Math.min((uniqueUserCount / 10) * 50, 50);
 
   const total = tapScore + frequencyScore + userScore;
   return Math.round(total);

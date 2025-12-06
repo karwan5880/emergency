@@ -2,7 +2,9 @@ import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
 // Helper function to get authenticated user ID from Clerk
-export async function getAuthUserId(ctx: { auth: { getUserIdentity: () => Promise<{ subject: string } | null> } }) {
+export async function getAuthUserId(ctx: {
+  auth: { getUserIdentity: () => Promise<{ subject: string } | null> };
+}) {
   try {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
@@ -63,8 +65,43 @@ export const syncUser = mutation({
         fullName: args.fullName,
         profileImage: args.profileImage,
         createdAt: Date.now(),
+        notificationsEnabled: true,
+        alarmSoundEnabled: true,
+        locationPermissionGranted: false,
       });
       return userId;
     }
+  },
+});
+
+// Mutation: Update user location
+export const updateUserLocation = mutation({
+  args: {
+    latitude: v.number(),
+    longitude: v.number(),
+    accuracy: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const clerkId = await getAuthUserId(ctx);
+    if (!clerkId) {
+      throw new Error("Unauthorized");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", clerkId))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await ctx.db.patch(user._id, {
+      lastKnownLatitude: args.latitude,
+      lastKnownLongitude: args.longitude,
+      locationPermissionGranted: true,
+    });
+
+    return { success: true };
   },
 });

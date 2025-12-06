@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Emergency App",
-  description: "Emergency management application",
+  title: "AlertRun - Emergency Alert System",
+  description:
+    "Instant emergency alerts and live streaming for disaster incidents. Save lives with real-time notifications.",
 };
 
 export default function RootLayout({
@@ -39,4 +40,3 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
-
