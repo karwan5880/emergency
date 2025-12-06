@@ -8,8 +8,10 @@
  * @module
  */
 
+import type * as alerts from "../alerts.js";
 import type * as emergencies from "../emergencies.js";
 import type * as notifications from "../notifications.js";
+import type * as severity from "../severity.js";
 import type * as users from "../users.js";
 
 import type {
@@ -19,8 +21,10 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  alerts: typeof alerts;
   emergencies: typeof emergencies;
   notifications: typeof notifications;
+  severity: typeof severity;
   users: typeof users;
 }>;
 

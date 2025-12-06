@@ -14,10 +14,10 @@ export const getUserNotifications = query({
     const notifications = await ctx.db
       .query("notifications")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .order("desc")
       .collect();
 
-    return notifications;
+    // Sort by createdAt descending (most recent first)
+    return notifications.sort((a, b) => b.createdAt - a.createdAt);
   },
 });
 
@@ -32,11 +32,13 @@ export const getUnreadNotifications = query({
 
     const notifications = await ctx.db
       .query("notifications")
-      .withIndex("by_userId_read", (q) => q.eq("userId", userId).eq("read", false))
-      .order("desc")
+      .withIndex("by_userId_read", (q) =>
+        q.eq("userId", userId).eq("read", false)
+      )
       .collect();
 
-    return notifications;
+    // Sort by createdAt descending (most recent first)
+    return notifications.sort((a, b) => b.createdAt - a.createdAt);
   },
 });
 
@@ -51,7 +53,9 @@ export const getUnreadNotificationCount = query({
 
     const notifications = await ctx.db
       .query("notifications")
-      .withIndex("by_userId_read", (q) => q.eq("userId", userId).eq("read", false))
+      .withIndex("by_userId_read", (q) =>
+        q.eq("userId", userId).eq("read", false)
+      )
       .collect();
 
     return notifications.length;
@@ -91,7 +95,9 @@ export const markAllNotificationsAsRead = mutation({
 
     const notifications = await ctx.db
       .query("notifications")
-      .withIndex("by_userId_read", (q) => q.eq("userId", userId).eq("read", false))
+      .withIndex("by_userId_read", (q) =>
+        q.eq("userId", userId).eq("read", false)
+      )
       .collect();
 
     for (const notification of notifications) {

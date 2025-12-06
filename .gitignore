@@ -43,3 +43,6 @@ next-env.d.ts
 _error.txt
 _notes.txt
 
+
+# clerk configuration (can include secrets)
+/.clerk/

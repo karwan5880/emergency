@@ -10,6 +10,8 @@ import { EmergencyForm } from "@/components/emergency-form";
 import { EmergencyList } from "@/components/emergency-list";
 import { EmergencyDetail } from "@/components/emergency-detail";
 import { UserSync } from "@/components/user-sync";
+import { EmergencyButton } from "@/components/emergency-button";
+import { SeverityIndicator } from "@/components/severity-indicator";
 import { useState } from "react";
 import type { Id } from "../../../convex/_generated/dataModel";
 
@@ -19,6 +21,7 @@ export default function Dashboard() {
   const [selectedEmergency, setSelectedEmergency] = useState<Id<"emergencies"> | null>(null);
   const stats = useQuery(api.emergencies.getEmergencyStats);
   const unreadCount = useQuery(api.notifications.getUnreadNotificationCount);
+  const activeAlerts = useQuery(api.alerts.getUserActiveAlerts);
 
   if (!isLoaded) {
     return (
@@ -100,6 +103,39 @@ export default function Dashboard() {
           </Card>
         </section>
 
+        {/* Active Alerts Section */}
+        {activeAlerts && activeAlerts.length > 0 && (
+          <section>
+            <h2 className="text-xl font-bold mb-4 text-red-400">Active Alerts</h2>
+            <div className="space-y-3">
+              {activeAlerts.map((alert) => (
+                <Card key={alert._id} className="bg-slate-800 border-red-500/30">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg text-red-400">
+                          {alert.title || "Emergency Alert"}
+                        </CardTitle>
+                        <CardDescription className="text-slate-400">
+                          Created {new Date(alert.createdAt).toLocaleTimeString()}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <SeverityIndicator
+                      score={alert.severityScore}
+                      tapCount={alert.tapCount}
+                      frequency={alert.tapFrequency}
+                      compact={false}
+                    />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Recent Emergencies */}
         <section>
           <h2 className="text-xl font-bold mb-4">Recent Emergencies</h2>
@@ -107,6 +143,11 @@ export default function Dashboard() {
             onEmergencyClick={(id) => setSelectedEmergency(id)}
           />
         </section>
+      </div>
+
+      {/* Floating Emergency Button */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <EmergencyButton />
       </div>
 
       {/* Emergency Form Modal */}
