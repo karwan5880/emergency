@@ -220,8 +220,6 @@ export const getUserActiveAlerts = query({
 
     // Sort by createdAt descending (most recent first)
     return alerts.sort((a, b) => b.createdAt - a.createdAt);
-
-    return alerts;
   },
 });
 
@@ -315,8 +313,6 @@ export const getActiveAlerts = query({
 
     // Sort by createdAt descending (most recent first)
     return alerts.sort((a, b) => b.createdAt - a.createdAt);
-
-    return alerts;
   },
 });
 
