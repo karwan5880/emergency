@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "convex/_generated/api";
 import { useState, useEffect, useRef } from "react";
 import { Radio, X, Users, Clock } from "lucide-react";
 import Link from "next/link";
-import type { Id } from "../../convex/_generated/dataModel";
+import type { Id } from "convex/_generated/dataModel";
 
 interface NotificationPanelProps {
   isOpen: boolean;

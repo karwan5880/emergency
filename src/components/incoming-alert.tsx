@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Phone, PhoneOff } from "lucide-react";
-import type { Id } from "../../convex/_generated/dataModel";
+import type { Id } from "convex/_generated/dataModel";
 
 interface IncomingAlertProps {
   alert: {

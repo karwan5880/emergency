@@ -1,9 +1,9 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "convex/_generated/api";
 import { Radio, Users, MapPin, X } from "lucide-react";
-import type { Id } from "../../convex/_generated/dataModel";
+import type { Id } from "convex/_generated/dataModel";
 
 interface PassiveModeScreenProps {
   currentStreamId?: Id<"emergency_alerts"> | null;
@@ -119,10 +119,10 @@ export function PassiveModeScreen({
           {/* Stats row */}
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-4">
-              {/* Distance */}
+              {/* Location */}
               <div className="flex items-center gap-1.5 text-slate-400">
                 <MapPin className="w-4 h-4" />
-                <span>{alert.distance?.toFixed(1) || "?"}km away</span>
+                <span>Nearby</span>
               </div>
 
               {/* Tap count */}

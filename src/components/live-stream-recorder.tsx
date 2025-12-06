@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Video, Square, Radio } from "lucide-react";
-import type { Id } from "../../convex/_generated/dataModel";
+import type { Id } from "convex/_generated/dataModel";
 
 interface LiveStreamRecorderProps {
   alertId: Id<"emergency_alerts">;

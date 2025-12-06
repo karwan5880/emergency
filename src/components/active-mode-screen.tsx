@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "convex/_generated/api";
 import { AlertTriangle, Zap } from "lucide-react";
 import { LiveStreamRecorder } from "./live-stream-recorder";
-import type { Id } from "../../convex/_generated/dataModel";
+import type { Id } from "convex/_generated/dataModel";
 
 interface ActiveModeScreenProps {
   onStreamingChange?: (isStreaming: boolean) => void;

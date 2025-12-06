@@ -11,7 +11,7 @@ import { BottomTabs } from "@/components/bottom-tabs";
 import { ActiveModeScreen } from "@/components/active-mode-screen";
 import { PassiveModeScreen } from "@/components/passive-mode-screen";
 import { useState, useEffect, useCallback } from "react";
-import type { Id } from "../../convex/_generated/dataModel";
+import type { Id } from "convex/_generated/dataModel";
 
 const DISMISSED_ALERTS_KEY = "alertrun_dismissed_alerts";
 

@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "convex/_generated/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Video, MapPin, Users, Activity } from "lucide-react";
-import type { Id } from "../../convex/_generated/dataModel";
+import type { Id } from "convex/_generated/dataModel";
 
 interface LiveStreamViewerProps {
   alertId: Id<"emergency_alerts">;
