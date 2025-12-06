@@ -101,3 +101,7 @@ Imagine this: User A spots a fire at the bottom of a tall building. No matter ho
 - As mentioned in the "Challenges" section, spending five or six figures to save a certain number of lives — is it really worth it? Unless we can drastically drive the cost down.
 - Cool idea, but not realistic, in my opinion.
 - Or, unless somebody takes this project as a startup idea and creates a new TikTok out of it?
+
+## References
+
+- https://www.threads.com/@striking_biking/post/DRgr4zOgdp7

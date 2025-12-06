@@ -14,6 +14,7 @@ interface NotificationPanelProps {
   currentStreamId?: Id<"emergency_alerts"> | null;
   dismissedAlerts: Set<string>;
   onDismiss: (alertId: string) => void;
+  loginTimestamp: number | null; // When user opened the app - only show alerts AFTER this (null = show none)
 }
 
 export function NotificationPanel({
@@ -23,6 +24,7 @@ export function NotificationPanel({
   currentStreamId,
   dismissedAlerts,
   onDismiss,
+  loginTimestamp,
 }: NotificationPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [userLocation, setUserLocation] = useState<{
@@ -66,10 +68,16 @@ export function NotificationPanel({
       : "skip"
   );
 
-  // Filter out dismissed alerts
-  const nearbyAlerts = (nearbyAlertsQuery || []).filter(
-    (alert) => !dismissedAlerts.has(alert._id)
-  );
+  // Filter out dismissed alerts AND alerts created before login
+  // CRITICAL: Only show alerts created AFTER user opened the app
+  // If loginTimestamp is null, show NO alerts
+  const nearbyAlerts =
+    loginTimestamp === null
+      ? []
+      : (nearbyAlertsQuery || []).filter(
+          (alert) =>
+            !dismissedAlerts.has(alert._id) && alert.createdAt >= loginTimestamp
+        );
 
   // Close on click outside
   useEffect(() => {

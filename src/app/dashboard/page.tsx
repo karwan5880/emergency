@@ -27,10 +27,43 @@ export default function Dashboard() {
   );
   const [hasAcknowledged, setHasAcknowledged] = useState(false); // Once true, no more phone call popups
   const [isActiveStreaming, setIsActiveStreaming] = useState(false); // Track if user is actively streaming
+  const [showIncomingAlerts, setShowIncomingAlerts] = useState(false); // Delay showing alerts after login
+  // Track when THIS page session started for THIS user
+  // CRITICAL: Only show alerts created AFTER this timestamp
+  // Use sessionStorage to persist across component remounts but reset on new tab/window
+  const [loginTimestamp, setLoginTimestamp] = useState<number | null>(null);
+
+  // Set loginTimestamp when user loads - use sessionStorage to be robust
+  useEffect(() => {
+    if (isLoaded && user) {
+      const sessionKey = `alertrun_session_${user.id}`;
+      const existingTimestamp = sessionStorage.getItem(sessionKey);
+
+      if (existingTimestamp) {
+        // Session already exists, use the existing timestamp
+        setLoginTimestamp(parseInt(existingTimestamp, 10));
+      } else {
+        // New session, set timestamp NOW
+        const ts = Date.now();
+        sessionStorage.setItem(sessionKey, ts.toString());
+        setLoginTimestamp(ts);
+      }
+    }
+  }, [isLoaded, user]);
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
+
+  // Delay showing incoming alerts after login (2 seconds grace period)
+  useEffect(() => {
+    if (isLoaded && user) {
+      const timer = setTimeout(() => {
+        setShowIncomingAlerts(true);
+      }, 2000); // 2 second delay
+      return () => clearTimeout(timer);
+    }
+  }, [isLoaded, user]);
 
   // Load dismissed alerts from localStorage
   useEffect(() => {
@@ -92,17 +125,28 @@ export default function Dashboard() {
 
   const nearbyAlerts = nearbyAlertsQuery || [];
 
-  // Filter out dismissed alerts for display
-  const visibleAlerts = nearbyAlerts.filter(
-    (alert) => !dismissedAlerts.has(alert._id)
-  );
+  // Filter out dismissed alerts and alerts created before login
+  // Only show alerts that happened AFTER user opened the app
+  // CRITICAL: If loginTimestamp is not set yet, show NO alerts
+  const visibleAlerts =
+    loginTimestamp === null
+      ? []
+      : nearbyAlerts.filter(
+          (alert) =>
+            !dismissedAlerts.has(alert._id) && alert.createdAt >= loginTimestamp
+        );
 
-  // Get count for bell icon badge (only non-dismissed)
+  // Get count for bell icon badge (only non-dismissed, post-login alerts)
   const alertCount = visibleAlerts.length;
 
-  // Find an alert to show as incoming (not dismissed, not currently watching)
+  // Find an alert to show as incoming
+  // CRITICAL: Only show alerts created AFTER user opened the app
+  // visibleAlerts is already filtered by loginTimestamp, so just check streaming status
   const incomingAlert = visibleAlerts.find(
-    (alert) => currentStreamId !== alert._id && activeTab === "passive"
+    (alert) =>
+      alert.isStreaming && // Only show if actively streaming
+      currentStreamId !== alert._id &&
+      activeTab === "passive"
   );
 
   // Handle accepting incoming alert
@@ -145,14 +189,18 @@ export default function Dashboard() {
       <UserSync />
 
       {/* Incoming Alert Notification (Phone Call Style) */}
-      {/* Only show if user hasn't acknowledged any alert yet */}
-      {incomingAlert && !currentStreamId && !hasAcknowledged && (
-        <IncomingAlert
-          alert={incomingAlert}
-          onAccept={handleAcceptAlert}
-          onDecline={handleDeclineAlert}
-        />
-      )}
+      {/* Only show if: user is loaded, alert exists, actively streaming, recent, not acknowledged, and after grace period */}
+      {incomingAlert &&
+        !currentStreamId &&
+        !hasAcknowledged &&
+        showIncomingAlerts &&
+        isLoaded && (
+          <IncomingAlert
+            alert={incomingAlert}
+            onAccept={handleAcceptAlert}
+            onDecline={handleDeclineAlert}
+          />
+        )}
 
       {/* Header */}
       <header className="p-3 sm:p-4 lg:p-6">
@@ -192,12 +240,19 @@ export default function Dashboard() {
                 currentStreamId={currentStreamId}
                 dismissedAlerts={dismissedAlerts}
                 onDismiss={handleDismissAlert}
+                loginTimestamp={loginTimestamp}
               />
             </div>
 
             {/* Logout */}
             <button
-              onClick={() => signOut({ redirectUrl: "/" })}
+              onClick={() => {
+                // Clear session timestamp so next login gets fresh timestamp
+                if (user?.id) {
+                  sessionStorage.removeItem(`alertrun_session_${user.id}`);
+                }
+                signOut({ redirectUrl: "/" });
+              }}
               className="text-slate-400 hover:text-white transition-colors p-1.5 sm:p-2"
               title="Sign out"
             >
