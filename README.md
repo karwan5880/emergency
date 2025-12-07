@@ -86,7 +86,7 @@ Imagine this: User A spots a fire at the bottom of a tall building. No matter ho
 ## Features (Future)
 
 - Subscribe mode (address-based notifications)
-- Radius-based mode (km range alerts)
+- Radius-based mode (km range alerts) (implemented. not tested. maybe work. )
 
 ## Closing Thoughts
 

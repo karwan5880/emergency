@@ -337,27 +337,13 @@ export const getNearbyActiveAlerts = query({
       return [];
     }
 
-    // Get user's login time (use account creation as baseline)
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", userId))
-      .first();
-
-    if (!user) {
-      return [];
-    }
-
     const radius = args.radiusKm || 10; // Default 10km radius
     const allAlerts = await ctx.db
       .query("emergency_alerts")
       .filter((q) =>
-        q.and(
-          q.or(
-            q.eq(q.field("status"), "active"),
-            q.eq(q.field("status"), "escalated")
-          ),
-          // Only show alerts created after user's account was created
-          q.gte(q.field("createdAt"), user.createdAt)
+        q.or(
+          q.eq(q.field("status"), "active"),
+          q.eq(q.field("status"), "escalated")
         )
       )
       .collect();
