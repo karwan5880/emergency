@@ -87,6 +87,7 @@ Imagine this: User A spots a fire at the bottom of a tall building. No matter ho
 
 - Subscribe mode (address-based notifications)
 - Radius-based mode (km range alerts) (implemented. not tested. maybe work. )
+- note_812am_test: after testing it, it actually work quite well, i'm amazed by convex function. i realize the browser will ask for location permission, and then convex will have the latitude longitude in the table and only blast / send the emergency alert to users at < x km.
 
 ## Closing Thoughts
 

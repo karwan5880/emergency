@@ -22,67 +22,123 @@ export function IncomingAlert({
 }: IncomingAlertProps) {
   const audioContextRef = useRef<AudioContext | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const alertRef = useRef(alert); // Keep latest alert for audio generation
   const [isVisible, setIsVisible] = useState(true);
 
-  // Play ringtone
+  // Update alert ref when it changes
   useEffect(() => {
-    startRingtone();
+    alertRef.current = alert;
+  }, [alert]);
+
+  // Play terrifying siren
+  useEffect(() => {
+    startSiren();
 
     return () => {
-      stopRingtone();
+      stopSiren();
     };
   }, []);
 
-  const startRingtone = () => {
+  const startSiren = () => {
     try {
       const audioContext = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
       audioContextRef.current = audioContext;
 
-      const playTone = () => {
+      // Create a TERRIFYING emergency siren
+      // Uses multiple oscillators for a rich, menacing, PANIC-INDUCING sound
+      const playSirenCycle = () => {
         if (
           !audioContextRef.current ||
           audioContextRef.current.state === "closed"
         )
           return;
 
-        const osc = audioContextRef.current.createOscillator();
-        const gain = audioContextRef.current.createGain();
+        const now = audioContextRef.current.currentTime;
 
-        osc.connect(gain);
-        gain.connect(audioContextRef.current.destination);
-
-        // Phone ring tone
-        osc.frequency.setValueAtTime(440, audioContextRef.current.currentTime);
-        osc.frequency.setValueAtTime(
-          480,
-          audioContextRef.current.currentTime + 0.2
+        // Scale volume based on severity - MORE TAPS = LOUDER SIREN!
+        const baseVolume = 0.6; // Already loud base
+        const severityMultiplier = Math.min(
+          alertRef.current.severityScore / 100,
+          1
         );
+        const volume = baseVolume + severityMultiplier * 0.25; // 0.6 to 0.85 (VERY LOUD!)
 
-        gain.gain.setValueAtTime(0.15, audioContextRef.current.currentTime);
-        gain.gain.exponentialRampToValueAtTime(
-          0.01,
-          audioContextRef.current.currentTime + 0.4
-        );
+        // Create multiple oscillators for a more complex, scary sound
+        // Layer 1: Deep, menacing base siren (very low frequency)
+        const osc1 = audioContextRef.current.createOscillator();
+        const gain1 = audioContextRef.current.createGain();
+        osc1.type = "sawtooth";
+        osc1.connect(gain1);
+        gain1.connect(audioContextRef.current.destination);
 
-        osc.start(audioContextRef.current.currentTime);
-        osc.stop(audioContextRef.current.currentTime + 0.4);
+        // Very low, menacing frequency (200Hz - 400Hz sweep)
+        osc1.frequency.setValueAtTime(200, now);
+        osc1.frequency.exponentialRampToValueAtTime(400, now + 0.8);
+        osc1.frequency.exponentialRampToValueAtTime(200, now + 1.6);
+
+        gain1.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(volume * 0.7, now + 0.1);
+        gain1.gain.setValueAtTime(volume * 0.7, now + 1.5);
+        gain1.gain.linearRampToValueAtTime(0, now + 1.6);
+        osc1.start(now);
+        osc1.stop(now + 1.6);
+
+        // Layer 2: Mid-range wailing siren (more piercing)
+        const osc2 = audioContextRef.current.createOscillator();
+        const gain2 = audioContextRef.current.createGain();
+        osc2.type = "sawtooth";
+        osc2.connect(gain2);
+        gain2.connect(audioContextRef.current.destination);
+
+        osc2.frequency.setValueAtTime(400, now);
+        osc2.frequency.exponentialRampToValueAtTime(800, now + 0.8);
+        osc2.frequency.exponentialRampToValueAtTime(400, now + 1.6);
+
+        gain2.gain.setValueAtTime(0, now);
+        gain2.gain.linearRampToValueAtTime(volume * 0.6, now + 0.1);
+        gain2.gain.setValueAtTime(volume * 0.6, now + 1.5);
+        gain2.gain.linearRampToValueAtTime(0, now + 1.6);
+        osc2.start(now);
+        osc2.stop(now + 1.6);
+
+        // Layer 3: High-pitched alert tone (gets attention)
+        const osc3 = audioContextRef.current.createOscillator();
+        const gain3 = audioContextRef.current.createGain();
+        osc3.type = "square"; // Harsher sound
+        osc3.connect(gain3);
+        gain3.connect(audioContextRef.current.destination);
+
+        osc3.frequency.setValueAtTime(600, now);
+        osc3.frequency.exponentialRampToValueAtTime(1200, now + 0.8);
+        osc3.frequency.exponentialRampToValueAtTime(600, now + 1.6);
+
+        // Pulsing pattern for urgency
+        gain3.gain.setValueAtTime(0, now);
+        gain3.gain.linearRampToValueAtTime(volume * 0.4, now + 0.05);
+        gain3.gain.setValueAtTime(volume * 0.4, now + 0.4);
+        gain3.gain.setValueAtTime(0, now + 0.45);
+        gain3.gain.setValueAtTime(volume * 0.4, now + 0.5);
+        gain3.gain.setValueAtTime(volume * 0.4, now + 0.9);
+        gain3.gain.setValueAtTime(0, now + 0.95);
+        gain3.gain.setValueAtTime(volume * 0.4, now + 1.0);
+        gain3.gain.setValueAtTime(volume * 0.4, now + 1.5);
+        gain3.gain.linearRampToValueAtTime(0, now + 1.6);
+        osc3.start(now);
+        osc3.stop(now + 1.6);
       };
 
-      // Ring pattern
-      playTone();
-      setTimeout(playTone, 200);
-
+      // Play immediately and repeat every 1.6 seconds (continuous, overlapping wails)
+      playSirenCycle();
       intervalRef.current = setInterval(() => {
-        playTone();
-        setTimeout(playTone, 200);
-      }, 2000);
+        playSirenCycle();
+      }, 1600); // Continuous, panic-inducing wails
     } catch (e) {
       console.error("Audio error:", e);
     }
   };
 
-  const stopRingtone = () => {
+  const stopSiren = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -98,13 +154,13 @@ export function IncomingAlert({
   };
 
   const handleAccept = () => {
-    stopRingtone();
+    stopSiren();
     setIsVisible(false);
     onAccept(alert._id);
   };
 
   const handleDecline = () => {
-    stopRingtone();
+    stopSiren();
     setIsVisible(false);
     onDecline(alert._id);
   };
