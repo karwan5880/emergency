@@ -102,6 +102,7 @@ Imagine this: User A spots a fire at the bottom of a tall building. No matter ho
 - As mentioned in the "Challenges" section, spending five or six figures to save a certain number of lives — is it really worth it? Unless we can drastically drive the cost down.
 - Cool idea, but not realistic, in my opinion.
 - Or, unless somebody takes this project as a startup idea and creates a new TikTok out of it?
+- **iOS Audio Limitation**: Safari blocks automatic audio playback (even for emergencies). Users must tap the alert to enable sound. This is a fundamental limitation of web apps on iOS - only native apps can auto-play audio. See `IOS_AUDIO_LIMITATIONS.md` for details.
 
 ## References
 
